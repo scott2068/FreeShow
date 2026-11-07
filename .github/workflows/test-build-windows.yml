@@ -1,0 +1,33 @@
+name: Test build (Windows, unsigned)
+on:
+  push:
+    branches:
+      - test/windows-build
+  workflow_dispatch:
+
+jobs:
+  build_windows:
+    runs-on: windows-2022
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build installer (unsigned, not published)
+        run: npm run release:local
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: FreeShow-Windows-test
+          path: dist/*.exe
+          if-no-files-found: error
+          retention-days: 14
